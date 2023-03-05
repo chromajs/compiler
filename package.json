@@ -1,0 +1,26 @@
+{
+	"name": "chroma-compiler",
+	"version": "1.0.0",
+	"description": "The globalized compiler for Chroma (Not made for personal use)",
+	"main": "./dist/index.js",
+	"scripts": {
+		"build": "tsc -d"
+	},
+	"repository": "https://github.com/chromajs/chroma-compiler",
+	"author": "ChromaJS",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/dompurify": "^2.4.0",
+		"@types/html-minifier": "^4.0.2",
+		"@types/jsdom": "^21.1.0",
+		"@types/marked": "^4.0.8",
+		"@types/node": "^18.14.6",
+		"typescript": "^4.9.5"
+	},
+	"dependencies": {
+		"dompurify": "^3.0.1",
+		"html-minifier": "^4.0.0",
+		"jsdom": "^21.1.0",
+		"marked": "^4.2.12"
+	}
+}
