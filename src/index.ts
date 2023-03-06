@@ -8,113 +8,56 @@ const purify = dompurify(window as unknown as Window);
 
 const chromaRegex = /<chroma>([^]*?)<\/chroma>/gi;
 const chromaSrcRegex = /<chroma src="([^]*?)"([^]*?)>/gi;
+const formatRegex = /(^\s+)/gm;
 
-function compile(content: string, tabSpace?: number): string {
-    if (!tabSpace) {
-        tabSpace = 4;
-    }
+function compile(content: string): string {
+	const pre = [...content.matchAll(chromaSrcRegex)];
+	const code = [...content.matchAll(chromaRegex)];
 
-    let tabsToSpaces = "";
-    for (let i = 0; i < tabSpace; i++) {
-        tabsToSpaces += " ";
-    }
+	pre.map((chromaReg) => {
+		const chromaString = chromaReg[0];
+		let md;
+		try {
+			md = readFileSync(
+				(chromaString.match(/"([^]*?)"/) as RegExpMatchArray)[0].split(
+					'"'
+				)[1],
+				"utf-8"
+			).replace(formatRegex, "");
+		} catch (e) {
+			console.error(
+				`[Chroma] Failed to compile: The file '${chromaString.match(
+					/"([^]*?)"/
+				)}' was not found`
+			);
+			process.exit(1);
+		}
 
-    const pre = [...content.matchAll(chromaSrcRegex)];
-    const code = [...content.matchAll(chromaRegex)];
+		content = content.replace(
+			chromaString,
+			purify.sanitize(marked(md, { async: false }))
+		);
+	});
 
-    pre.map(chromaReg => {
-        const chromaString = chromaReg[0];
-        let md;
-        try {
-            md = readFileSync((chromaString.match(/"([^]*?)"/) as RegExpMatchArray)[0].split("\"")[1], "utf-8");
-        } catch (e) {
-            console.log("[Chroma] Failed to compile! Chroma SRC Markdown File does not exist!");
-            process.exit(1);
-        }
+	code.map((chromaReg) => {
+		const chromaString = chromaReg[0];
 
-        content = content.replace(
-            chromaString,
-            purify.sanitize(marked(md, { async: false }))
-        );
-    });
+		while (content.indexOf(chromaString) !== -1) {
+			const noTag = chromaString
+				.replace(/<chroma>/gi, "")
+				.replace(/<\/chroma>/gi, "")
+				.replace(formatRegex, "");
 
-    code.map((chromaReg) => {
-        const chromaString = chromaReg[0];
+			content = content
+				.replace(
+					chromaString,
+					purify.sanitize(marked(noTag, { async: false }))
+				)
+				.replace(formatRegex, "");
+		}
+	});
 
-        while (content.indexOf(chromaString) !== -1) {
-            const noTag = chromaString
-                .replace(/<chroma>/gi, "")
-                .replace(/<\/chroma>/gi, "")
-                .replace(/\t/gi, tabsToSpaces);
-
-            let splitter = "\n";
-            if (noTag.includes("\r\n")) {
-                splitter = "\r\n";
-            }
-
-            let lines = noTag.split(splitter);
-            let whiteSpace = 0;
-            let clauseCodeIndex;
-            for (let i = 0; i < lines.length; i++) {
-                whiteSpace = 0;
-
-                const line = lines[i];
-                let found = false;
-                for (let j = 0; j < line.length; j++) {
-                    if (line[j] === "|") {
-                        clauseCodeIndex = i;
-                        found = true;
-                        break;
-                    } else {
-                        whiteSpace++;
-                    }
-                }
-
-                if (found) {
-                    break;
-                }
-            }
-
-            if (clauseCodeIndex === undefined) {
-                console.log(`[Chroma] Failed to compile! HTML File missing Clause Code: "|"`);
-                process.exit(1);
-            }
-
-            lines[clauseCodeIndex] = lines[clauseCodeIndex].replace("|", "");
-
-            lines.map((line, index) => {
-                let whiteSpaceCount = 0;
-                let firstChar;
-
-                for (let i = 0; i < line.length; i++) {
-                    if (!line[i].match(/ |\n|\r|\t/)) {
-                        firstChar = i;
-                        break;
-                    }
-                }
-                //console.log(firstChar);
-
-                if (!firstChar) {
-                    firstChar = line.length - 1;
-                }
-
-                for (let i = 0; i < firstChar; i++) {
-                    if (whiteSpaceCount < whiteSpace && line[i].match(/ |\n|\r|\t/)) {
-                        whiteSpaceCount++;
-                    }
-                }
-
-                lines[index] = lines[index].slice(whiteSpaceCount);
-            });
-
-            content = content.replace(
-                chromaString,
-                purify.sanitize(marked(lines.join(splitter), { async: false }))
-            );
-        }
-    });
-
-    return content;
+	return content;
 }
 
 exports.default = compile;

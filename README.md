@@ -1,9 +1,3 @@
 # chroma-compiler
 
-The globalized compiler for Chroma (Not made for personal use)
-
-# What is this?
-
-You most likely won't have to deal with the file if you are using Chroma projects.
-
-This exports Chroma's globalized compile function for Markdown to HTML
+This is the standard compiler for Chroma and is not meant to be used by developers. If you're looking to create a project with Chroma, [see the docs](https://chromajs.github.io/).
