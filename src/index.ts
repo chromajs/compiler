@@ -2,7 +2,6 @@ import { readFileSync } from "fs";
 import { marked } from "marked";
 import dompurify from "dompurify";
 import { JSDOM } from "jsdom";
-import { minify } from "html-minifier";
 
 const window = new JSDOM("").window;
 const purify = dompurify(window as unknown as Window);
@@ -19,10 +18,6 @@ function compile(content: string, tabSpace?: number): string {
     for (let i = 0; i < tabSpace; i++) {
         tabsToSpaces += " ";
     }
-
-    content = minify(content, {
-        removeComments: true,
-    });
 
     const pre = [...content.matchAll(chromaSrcRegex)];
     const code = [...content.matchAll(chromaRegex)];
