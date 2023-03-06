@@ -85,11 +85,7 @@ function compile(content: string, tabSpace?: number): string {
                 process.exit(1);
             }
 
-            if (lines.length > 1) {
-                lines = lines.slice(clauseCodeIndex + 1);
-            } else {
-                lines[0] = lines[0].replace("|", "");
-            }
+            lines[clauseCodeIndex] = lines[clauseCodeIndex].replace("|", "");
 
             lines.map((line, index) => {
                 let whiteSpaceCount = 0;

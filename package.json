@@ -1,6 +1,6 @@
 {
 	"name": "chroma-compiler",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "The globalized compiler for Chroma (Not made for personal use)",
 	"main": "./dist/index.js",
 	"scripts": {
