@@ -27,9 +27,22 @@ export default function engine(src: string): string {
   });
 
   [...src.matchAll(regex.quote)].map(i => {
+    console.log(i[0]);
+
     src = src.replace(
       i[0],
-      i[0].replace('> ', '<blockquote>').replace('\n\n', '</blockquote>\n\n')
+      i[0].replace('> ', '<blockquote>').concat('</blockquote>\n\n')
+    );
+  });
+
+  [...src.matchAll(regex.ulistBlock)].map(i => {
+    src = src.replace(i[0], '<ul>' + i[0] + '</ul>');
+  });
+
+  [...src.matchAll(regex.ulist)].map(i => {
+    src = src.replace(
+      i[0],
+      i[0].replace('- ', '<li>').replace('\n', '</li>\n')
     );
   });
 
