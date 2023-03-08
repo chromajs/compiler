@@ -44,9 +44,5 @@ function compile(src: string) {
     return src;
 }
 
-console.log(compile(`
-<chroma src="hello.md"/>
-`));
-
 exports.default = compile;
 export = compile;
