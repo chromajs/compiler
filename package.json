@@ -1,5 +1,5 @@
 {
-  "name": "compiler",
+  "name": "@chromajs/compiler",
   "version": "1.0.0",
   "description": "The standard compiler for Chroma.",
   "main": "./dist/index.js",
