@@ -1,11 +1,11 @@
 {
-  "name": "chroma-compiler",
+  "name": "@chromajs/chroma-compiler",
   "version": "1.0.0",
   "description": "The standard compiler for Chroma",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "tsc && node ./dist/index.js"
+    "build": "tsc -d",
+    "start": "tsc -d && node ./dist/index.js"
   },
   "repository": "https://github.com/chromajs/chroma-compiler",
   "author": "Chroma",
@@ -13,11 +13,17 @@
   "private": false,
   "devDependencies": {
     "@types/node": "^18.14.6",
-    "@types/prettier": "^2.7.2",
     "typescript": "^4.9.5"
   },
-  "type": "module",
   "dependencies": {
-    "prettier": "^2.8.4"
+    "@types/dompurify": "^2.4.0",
+    "@types/jsdom": "^21.1.0",
+    "@types/marked": "^4.0.8",
+    "dompurify": "^3.0.1",
+    "jsdom": "^21.1.0",
+    "marked": "^4.2.12"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

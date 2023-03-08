@@ -1,44 +1,52 @@
-import engine from './utils/engine.js';
-import { format } from 'prettier';
+import { marked } from "marked";
+import dompurify from "dompurify";
+import { JSDOM } from "jsdom";
+import { readFileSync } from "fs";
 
-compile(
-  `
-# Heading
+import regex from "./utils/regex";
+import parseChromaTags from "./utils/parseChromaTags";
 
-## Heading 2
+const window = new JSDOM("").window;
+const purify = dompurify(window as unknown as Window);
 
-### Heading 3
+function compile(src: string) {
+    [...src.matchAll(regex.srcChromaTags)].map((chromaTag) => {
+        const chromaString = chromaTag[0];
+        let md;
+        try {
+            md = readFileSync((chromaString.match(regex.src) as RegExpMatchArray)[0].split("\"")[1], "utf-8");
+        } catch (e) {
+            throw Error("[Chroma] Failed to compile! Chroma SRC Markdown File does not exist!");
+        }
 
-#### Heading 4
+        src = src.replace(
+            chromaString,
+            purify.sanitize(marked(md, { async: false }))
+        );
+    });
 
-##### Heading 5
+    [...src.matchAll(regex.chromaTag)].map((chromaTag) => {
+        const chromaString = chromaTag[0];
+        const clauseCode = chromaString.match(regex.clauseCode);
+        let useClauseCode = false;
 
-###### Heading 6
+        if (clauseCode) {
+            if ((chromaString.indexOf("|")) - 1 > -1) {
+                if (chromaString[chromaString.indexOf("|") - 1] !== "\\") {
+                    useClauseCode = true;
+                }
+            }
+        }
 
+        src = src.replace(regex.chromaTag, parseChromaTags(chromaTag, useClauseCode, purify));
+    });
 
-*italic*
-
-**bold**
-
-***bolditalic***
-
-> Blockquote
-Blockquote Continue
-
-- ulist
-- ulist
-- ulist
-- ulist
-- ulist
-`,
-  'html'
-);
-
-export default function compile(src: string, lang: string): string {
-  let res = format(engine(src), {
-    parser: lang,
-  }).trimEnd();
-
-  console.log(res);
-  return res;
+    return src;
 }
+
+console.log(compile(`
+<chroma src="hello.md"/>
+`));
+
+exports.default = compile;
+export = compile;

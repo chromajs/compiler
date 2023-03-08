@@ -1,7 +1,11 @@
-export let heading = /#{1,6} .*$/gim,
-  boldItalic = /\*{3}(.*?)\*{3}/gim,
-  bold = /\*{2}(.*?)\*{2}/gim,
-  italic = /\*{1}(.*?)\*{1}/gim,
-  quote = /(^> .*?\n{2})/gims,
-  ulist = /- .*$/gim,
-  ulistBlock = /(^\s*-\s+.+\n)+/gim;
+export default {
+    chromaTag: /<chroma>([^]*?)<\/chroma>/gi,
+    srcChromaTags: /<chroma src="([^]*?)"([ ]*?)\/>/gi,
+    clauseCode: /|/,
+    noWhiteSpace: /\S/,
+    whiteSpace: /\s/,
+    openingChromaTag: /<chroma>/gi,
+    closingChromaTag: /<\/chroma>/gi,
+    tabs: /\t/gi,
+    src: /"([^]*?)"/,
+}
